@@ -1,0 +1,61 @@
+<h1>welcome to option entry</h1>
+<ul>
+    <li>
+        Student ID : <%= student.ID %>
+    </li>
+    <li>
+        Student name : <%= student.fname %>  <%= student.mname %> <%= student.lname %>
+    </li>
+    <li>
+        email : <%= student.email %>
+    </li>
+</ul>
+<h4>ADD new option</h4>
+<form method="POST" action="/insertNew/<%= student.ID %> ">
+    <input type="number" min="1" max="3" placeholder="preference number" name="number">
+    <input type="text" placeholder="univID" name="univ">
+    <input type="text" placeholder="courseID" name="course">
+    <button>submit</button>
+</form>
+
+<h3>The options entered are:</h3>
+<table border="1" cellspacing='0' cellpadding='5'>
+    <thead>
+        <th>preference number</th>
+        <th>University ID</th>
+        <th>Course ID</th>
+    </thead>
+    <tbody>
+        <% for(p=0; p<preference.length;p++) { %>
+            <tr>
+                <td><%= preference[p].Pnum %></td>
+                <td><%= preference[p].univID %></td>
+                <td><%= preference[p].courseID %></td>
+            </tr>
+            <% } %>
+    </tbody>
+</table>
+
+<h3>Seat Matrix</h3>
+<table border="1" cellspacing='0' cellpadding='5'>
+    <thead>
+        <th>University ID</th>
+        <th>University Name</th>
+        <th>Course ID</th>
+        <th>Course Name</th>
+        <th>Number of Seats</th>
+    </thead>
+    <tbody>
+        <% for(i=0; i<seatmatrix.length;i++) { %>
+            <tr>
+                <td><%= seatmatrix[i].univID %></td>
+                <td><%= seatmatrix[i].univName %></td>
+                <td><%= seatmatrix[i].courseID %></td>
+                <td><%= seatmatrix[i].courseName %></td>
+                <td><%= seatmatrix[i].numOfSeats %></td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+
