@@ -1,11 +1,10 @@
 const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
+const flash = require("connect-flash");
+const session = require("express-session");
 
 const app = express();
-
-app.set("view engine", "ejs");
-app.use(bodyParser.urlencoded({extended: true}));
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -15,67 +14,88 @@ const connection = mysql.createConnection({
     port: "3306",
 });
 
-
-app.post('/optionEntry', function(req, res){
-    let id = req.body.studId;
-    res.redirect('/optionEntry/'+id);
-})
-
-app.get('/', function(req, res){
-    res.render('login')
+connection.connect((err) => {
+    if (err) throw err;
+    else console.log("connected");
 });
 
+app.use(
+    session({
+        secret: "secret",
+        resave: true,
+        saveUninitialized: true,
+    })
+);
 
-app.get('/optionEntry/:id', function(req, res){
+app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(flash());
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
+
+// ----------- ROUTES -------------
+
+app.post("/optionEntry", function (req, res) {
+    let id = req.body.studId;
+    res.redirect(`/optionEntry/${id}`); 
+});
+
+app.get("/", function (req, res) {
+    res.render("login");
+});
+
+app.get("/optionEntry/:id", (req, res) => {
     const id = req.params.id;
-    const q = "select * from Student where ID = " + mysql.escape(id) ;
-    connection.query(q, function(err, results){
-        if(err) throw err;
-        else{
-            if(results.length == 0)
-                res.render('error');
-            else
-            {
-                const q2 = 'select univID, U.name as univName, courseID, C.name as courseName, numOfSeats from course C, university U, seatmatrix M where univID = U.ID and courseID = C.ID';
-                connection.query(q2, function(err, results2){
-                    if(err) throw err;
-                    else{
+    const q = `select * from Student where ID = ${mysql.escape(id)}`;
+    connection.query(q, (err, results) => {
+        if (err) throw err;
+        else {
+            if (results.length == 0) {
+                req.flash("error", "Invalid student ID");
+                res.redirect("/");
+            } else {
+                const q2 =
+                    "select univID, U.name as univName, courseID, C.name as courseName, numOfSeats from course C, university U, seatmatrix M where M.univID = U.ID and M.courseID = C.ID order by univID, courseID";
+                connection.query(q2, (err, results2) => {
+                    if (err) throw err;
+                    else {
                         // console.log(results2);
-                        const q3 = 'select * from Preference where studID = ' + mysql.escape(id);
-                        connection.query(q3, function(err, results3){
-                            if(err) throw err;
+                        const q3 = `select * from Preference where studID = ${mysql.escape(id)} order by Pnum`;
+                        connection.query(q3, (err, results3) => {
+                            if (err) throw err;
                             console.log(results3);
-                            res.render('option', {student: results[0], seatmatrix: results2, preference: results3})
-                        })
-                        
-                    }   
-                })
-                // console.log(results[0]);
+                            res.render("option", {
+                                student: results[0],
+                                seatmatrix: results2,
+                                preference: results3,
+                            });
+                        });
+                    }
+                });
             }
-                
         }
     });
-})
+});
 
-app.post('/insertNew/:id', function(req, res){
+app.post("/insertNew/:id", (req, res) => {
     const id = req.params.id;
     const pref = {
         studID: id,
         Pnum: req.body.number,
         univID: req.body.univ,
-        courseID: req.body.course
+        courseID: req.body.course,
     };
-    const q = 'INSERT INTO Preference set ?';
-    connection.query(q, pref, function(err, results){
-        if(err)throw err;
-        console.log(results);
-    })
-    res.redirect('/optionEntry/'+id);
-})
-
-connection.connect(function (err) {
-    if (err) throw err;
-    else console.log("connected");
+    const q = "INSERT INTO Preference set ?";
+    connection.query(q, pref, (err, results) => {
+        if (err) {
+            console.log(err.sqlMessage);
+            req.flash("error", err.sqlMessage);
+        }
+        res.redirect(`/optionEntry/${id}`);
+    });
 });
 
 const port = process.env.PORT || 3000;

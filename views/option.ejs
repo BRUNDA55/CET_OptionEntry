@@ -1,4 +1,7 @@
-<h1>welcome to option entry</h1>
+<%- include('partials/header') %> 
+<%- include('partials/flash') %>
+
+
 <ul>
     <li>
         Student ID : <%= student.ID %>
@@ -12,7 +15,7 @@
 </ul>
 <h4>ADD new option</h4>
 <form method="POST" action="/insertNew/<%= student.ID %> ">
-    <input type="number" min="1" max="3" placeholder="preference number" name="number">
+    <input type="number" placeholder="preference number" name="number">
     <input type="text" placeholder="univID" name="univ">
     <input type="text" placeholder="courseID" name="course">
     <button>submit</button>
@@ -24,6 +27,8 @@
         <th>preference number</th>
         <th>University ID</th>
         <th>Course ID</th>
+        <th></th>
+        <th></th>
     </thead>
     <tbody>
         <% for(p=0; p<preference.length;p++) { %>
@@ -31,6 +36,8 @@
                 <td><%= preference[p].Pnum %></td>
                 <td><%= preference[p].univID %></td>
                 <td><%= preference[p].courseID %></td>
+                <td><a href="">edit</a></td>
+                <td><a href="">delete</a></td>
             </tr>
             <% } %>
     </tbody>
@@ -58,4 +65,5 @@
     </tbody>
 </table>
 
+<%- include('partials/footer') %> 
 
