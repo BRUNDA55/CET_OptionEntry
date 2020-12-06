@@ -15,7 +15,8 @@
 </ul>
 <h4>ADD new option</h4>
 <form method="POST" action="/insertNew/<%= student.ID %> ">
-    <input type="number" placeholder="preference number" name="number">
+    <label for="pnumber">Preference Number</label>
+    <input type="number" placeholder="preference number" name="number" id="pnumber">
     <input type="text" placeholder="univID" name="univ">
     <input type="text" placeholder="courseID" name="course">
     <button>submit</button>
@@ -36,12 +37,12 @@
                 <td><%= preference[p].Pnum %></td>
                 <td><%= preference[p].univID %></td>
                 <td><%= preference[p].courseID %></td>
-                <td><a href="">edit</a></td>
-                <td><a href="">delete</a></td>
+                <td><a href="/edit/<%= preference[p].studID %>/<%= preference[p].Pnum %>">edit</a></td>
+                <td><a href="/delete/<%= preference[p].studID %>/<%= preference[p].Pnum %>">delete</a></td>
             </tr>
             <% } %>
     </tbody>
-</table>
+</table> 
 
 <h3>Seat Matrix</h3>
 <table border="1" cellspacing='0' cellpadding='5'>
@@ -65,5 +66,6 @@
     </tbody>
 </table>
 
-<%- include('partials/footer') %> 
+
+<%- include('partials/footer') %>  -->
 

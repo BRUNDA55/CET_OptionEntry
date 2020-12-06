@@ -28,6 +28,7 @@ app.use(
 );
 
 app.set("view engine", "ejs");
+app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(flash());
 app.use((req, res, next) => {
@@ -47,6 +48,40 @@ app.get("/", function (req, res) {
     res.render("login");
 });
 
+// new show
+// app.get("/optionEntry/:id", (req, res)=>{
+//     const id = req.params.id;
+//     const q1 = `select * from Student where ID = ${mysql.escape(id)}`;
+//     connection.query(q1, (err, result1)=>{
+//         if (err) 
+//             throw err;
+//         else 
+//         {
+//             if (result1.length == 0) {
+//                 req.flash("error", "Invalid student ID");
+//                 res.redirect("/");
+//             }
+//             else{
+//                 const q2 = `select ID, name from University`;
+//                 connection.query(q2, (err, result2)=>{
+//                     if(err) throw err;
+//                     else{
+//                         const q3 = `select ID, name from Course`;
+//                         connection.query(q3, (err, result3)=>{
+//                             if(err) throw err;
+//                             console.log(result2);
+//                             console.log(result3);
+//                             console.log(result1[0]);
+//                             res.render('option', {student: result1[0], university: result2[0], course: result3[0]})
+//                         })
+//                     }
+//                 })
+//             }
+//         }
+//     })
+// })
+
+// show route 
 app.get("/optionEntry/:id", (req, res) => {
     const id = req.params.id;
     const q = `select * from Student where ID = ${mysql.escape(id)}`;
@@ -80,6 +115,7 @@ app.get("/optionEntry/:id", (req, res) => {
     });
 });
 
+// create route
 app.post("/insertNew/:id", (req, res) => {
     const id = req.params.id;
     const pref = {
@@ -97,6 +133,44 @@ app.post("/insertNew/:id", (req, res) => {
         res.redirect(`/optionEntry/${id}`);
     });
 });
+
+// edit route
+app.get('/edit/:id/:num', (req, res)=>{
+    const {id, num} = req.params;
+    const q = `select * from Preference where studID = ${mysql.escape(id)} and Pnum = ${mysql.escape(num)}`;
+    connection.query(q, (err, result)=>{
+        if(err) throw err;
+        res.render('edit_form', {preference: result[0]});
+    })
+})
+
+app.post('/edit/:id/:num', (req, res)=>{
+    const {id, num} = req.params;
+    const univ = req.body.univ;
+    const course =  req.body.course;
+    const q = `update Preference set courseID = ${mysql.escape(course)}, univID = ${mysql.escape(univ)} where studID = ${mysql.escape(id)} and Pnum = ${mysql.escape(num)}`;
+    connection.query(q, (err, result)=>{
+        if(err) {
+            console.log(err.sqlMessage);
+            req.flash("error", err.sqlMessage);
+        }
+        res.redirect(`/optionEntry/${id}`);
+    })
+})
+
+// delete route
+app.get('/delete/:id/:num', (req, res)=>{
+    const {id, num} = req.params;
+    const q = `delete from Preference where studID = ${mysql.escape(id)} and Pnum = ${mysql.escape(num)}`;
+    connection.query(q, (err, result)=>{
+        if(err){
+            console.log(err.sqlMessage);
+            req.flash("error", err.sqlMessage);
+        }
+        req.flash("error", "option deleted!!!");
+        res.redirect(`/optionEntry/${id}`);
+    })
+})
 
 const port = process.env.PORT || 3000;
 app.listen(port);
