@@ -1,0 +1,69 @@
+<%- include('partials/header') %> 
+<%- include('partials/flash') %>
+
+
+    <div class="mb-5">
+        <h1 class="text-center"><%= univ[0].name %> - <%= univ[0].ID %></h1>
+        <h4 class="text-center"><%= univ[0].address %></h3>
+    </div>
+    
+    <table id="optionTable" class="table mb-5">
+        <thead class="thead-dark">
+            <th>course ID</th>
+            <th>credits</th>
+            <th>edit</th>
+        </thead>
+        <tbody>
+            <% for(i=0; i<univ.length;i++) { %>
+                <tr >
+                    <td><%= univ[i].courseID %></td>
+                    <td><%= univ[i].totalCredits %></td>
+                    <td class="w-50">
+                        <form method="POST" action="/editCredits/<%= univ[i].ID %>/<%= univ[i].adminID %>/<%= univ[i].courseID %>">
+                            <input type="number" placeholder="credits" name="credits">  <button class="btn btn-primary">edit</button>
+                        </form>
+                    </td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+    
+<div class="card my-4 border border-dark bg-light">
+    <div class="card-body">
+        <h2 class="text-center">ADD course</h2>
+    <form method="POST" action="/addCourse/<%= univ[0].adminID %>/<%= univ[0].ID %>" class="px-5 ">
+        <div class="mb-3">
+            <label for="courseID" class="form-label">Course ID</label>
+            <input type="text" placeholder="c29" name="courseID" id="courseID" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="totalCredits" class="form-label">Total Credits</label>
+            <input type="number" name="credits"  id="totalCredits" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="numOfSeats" class="form-label">Number of Seats</label>
+            <input type="number" name="numOfSeats"  id="numOfSeats" class="form-control">
+        </div>
+        <button class="btn btn-success">submit</button>
+    </form>
+    </div>
+</div>
+<div id="back" class="mb-5">
+    <button class="btn btn-danger">
+        <a href="/" class="text-light">LOG OUT</a>
+    </button>
+</div>
+
+
+    
+
+
+
+
+
+
+
+
+
+
+<%- include('partials/footer') %>

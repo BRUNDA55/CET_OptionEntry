@@ -1,17 +1,73 @@
-<%- include('partials/header') %> <%- include('partials/flash') %>
-<form method="POST" action="/optionEntry">
-    <div class="form-group">
-        <input
-            type="text"
-            class="form-control"
-            placeholder="enter userID"
-            name="studId"
-            required
-        />
+<%- include('partials/header') %> 
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a href="#" class="navbar-brand">HOME</a>
+        <!-- <button id="seat-matrix" class="btn btn-success mt-3"> -->
+           <a href="/showSeatMatrix" class="text-dark navbar-brand">Seat Matrix</a>
+        <!-- </button> -->
     </div>
-    <div class="form-group">
-        <button class="btn btn-primary">Enter</button>
+</nav>
+
+<%- include('partials/flash') %>
+<div id="header" class="jumbotron head">
+    <h1 class="text-center">welcome to option entry</h1>
+</div>
+
+<div id="forms" class="pt-5">
+    <div class="card" style="width: 45%;">
+        <div class="card-body">
+            <h3 class="card-title">STUDENT LOGIN</h3>
+            <form method="POST" action="/optionEntry">
+                <div class="form-group">
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="enter userID"
+                        name="studId"
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary">Enter</button>
+                </div>
+            </form>
+        </div>
     </div>
-</form>
+    
+    <div class="card" style="width: 45%;">
+        <div class="card-body">
+            <h3 class="card-title">ADMIN LOGIN</h3>
+            <form method="POST" action="/admin">
+                <div class="form-group">
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="ID"
+                        name="adminId"
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary">Enter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+</div>
+
+
+    
+
+
+<div id="about">
+    <h2 class="text-center">About project</h2>
+    <div style="width: 60%; margin: 0 auto;">   
+        <p class="text-center" style="font-size: 1.3rem;">The user enters the id and login the option entry where he can entrer the college prefrence and also add,delete or modify the entered college details.</p>
+    </div>
+           
+</div>
 
 <%- include('partials/footer') %>

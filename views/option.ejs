@@ -1,71 +1,103 @@
 <%- include('partials/header') %> 
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        
+        <!-- <button id="seat-matrix" class="btn btn-success mt-3"> -->
+        <a href="/showSeatMatrix" class="text-dark navbar-brand">View Seat Matrix</a>
+        <a href="/" class="navbar-brand">LOG OUT</a>
+        <!-- </button> -->
+    </div>
+</nav>
 <%- include('partials/flash') %>
+<div id="header" class="jumbotron">
+    <h1 class="text-center">welcome to option entry</h1>
+</div>
 
 
-<ul>
-    <li>
-        Student ID : <%= student.ID %>
-    </li>
-    <li>
-        Student name : <%= student.fname %>  <%= student.mname %> <%= student.lname %>
-    </li>
-    <li>
-        email : <%= student.email %>
-    </li>
-</ul>
-<h4>ADD new option</h4>
-<form method="POST" action="/insertNew/<%= student.ID %> ">
-    <label for="pnumber">Preference Number</label>
-    <input type="number" placeholder="preference number" name="number" id="pnumber">
-    <input type="text" placeholder="univID" name="univ">
-    <input type="text" placeholder="courseID" name="course">
-    <button>submit</button>
-</form>
+<div id="option">
+    
+    <!-- <ul class="list-group">
+        <li class="list-group-item text-center">
+            Student ID : <%= student.ID %>
+        </li>
+        <li class="list-group-item text-center">
+            email : <%= student.email %>
+        </li>
+    </ul> -->
+    
+    <div id="details" class="w-50 mx-auto text-center">
+        <h3 class="text-center my-3">Hi there, <%= student.fname %>  <%= student.mname %> <%= student.lname %></h3>
+        <p>Student ID : <%= student.ID %></p>
+        <p>email : <%= student.email %></p>
+    </div>
+    
+</div>
 
-<h3>The options entered are:</h3>
-<table border="1" cellspacing='0' cellpadding='5'>
-    <thead>
-        <th>preference number</th>
-        <th>University ID</th>
-        <th>Course ID</th>
-        <th></th>
-        <th></th>
-    </thead>
-    <tbody>
-        <% for(p=0; p<preference.length;p++) { %>
-            <tr>
-                <td><%= preference[p].Pnum %></td>
-                <td><%= preference[p].univID %></td>
-                <td><%= preference[p].courseID %></td>
-                <td><a href="/edit/<%= preference[p].studID %>/<%= preference[p].Pnum %>">edit</a></td>
-                <td><a href="/delete/<%= preference[p].studID %>/<%= preference[p].Pnum %>">delete</a></td>
-            </tr>
-            <% } %>
-    </tbody>
-</table> 
-
-<h3>Seat Matrix</h3>
-<table border="1" cellspacing='0' cellpadding='5'>
-    <thead>
-        <th>University ID</th>
-        <th>University Name</th>
-        <th>Course ID</th>
-        <th>Course Name</th>
-        <th>Number of Seats</th>
-    </thead>
-    <tbody>
-        <% for(i=0; i<seatmatrix.length;i++) { %>
-            <tr>
-                <td><%= seatmatrix[i].univID %></td>
-                <td><%= seatmatrix[i].univName %></td>
-                <td><%= seatmatrix[i].courseID %></td>
-                <td><%= seatmatrix[i].courseName %></td>
-                <td><%= seatmatrix[i].numOfSeats %></td>
-            </tr>
-        <% } %>
-    </tbody>
-</table>
+<div class="card my-4 border border-dark">
+    <div class="card-body">
+        <h4>ADD new option</h4>
+        <form method="POST" action="/insertNew/<%= student.ID %>">
+            <div class="mb-3">
+                <label for="pnumber" class="form-label">Preference Number</label>
+                <input type="number" placeholder="preference number" name="number" id="pnumber" class="form-control">
+            </div>
+            
+            <!-- <input type="text" placeholder="univID" name="univ"> -->
+            <div class="mb-3">
+                <select name="univ" id="" class="form-control form-select" aria-label="Default select example">
+                    <option selected disabled>Select University</option>
+                    <% for(i=0;i<university.length;i++) {%>
+                    <option value="<%= university[i].ID %>"><%= university[i].ID %> - <%= university[i].name %></option>
+                    <% } %>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <select name="course" class="form-control form-select" aria-label="Default select example">
+                    <option selected disabled>Select Course</option>
+                    <% for(i=0;i<course.length;i++) {%>
+                    <option value="<%= course[i].ID %>"><%= course[i].ID %> - <%= course[i].name %></option>
+                    <% } %>
+                </select>
+            </div>
+            <!-- <input type="text" placeholder="courseID" name="course"> -->
+            
+            <button class="btn btn-success">submit</button>
+        </form>
+    </div>
+</div>
 
 
-<%- include('partials/footer') %>  -->
+
+<div id="optionTable">
+    <h3 class="text-center pb-2">Your Options</h3>
+    <table class="table">
+        <thead class="thead-dark">
+            <th>preference number</th>
+            <th>University ID</th>
+            <th>Course ID</th>
+            <th></th>
+            <th></th>
+        </thead>
+        <tbody>
+            <% for(p=0; p<preference.length;p++) { %>
+                <tr style="background-color: rgb(247, 238, 242);">
+                    <td><%= preference[p].Pnum %></td>
+                    <td><%= preference[p].univID %></td>
+                    <td><%= preference[p].courseID %></td>
+                    <td><button class="btn btn-primary"><a href="/edit/<%= preference[p].studID %>/<%= preference[p].Pnum %>" class="text-light">edit</a></button></td>
+                    <td><button class="btn btn-danger"><a href="/delete/<%= preference[p].studID %>/<%= preference[p].Pnum %>" class="text-light">delete</a></button></td>
+                </tr>
+                <% } %>
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<%- include('partials/footer') %> 
 

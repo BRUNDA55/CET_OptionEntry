@@ -1,8 +1,60 @@
-body{
+/* body{
     background-image: url('https://unsplash.com/photos/rSULYdJoEoQ');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
+} */
+
+
+
+
+.card{
+    width: 50%;
+    margin: 0 auto 0 auto;
+}
+/* #c4aead; */
+#header{
+    background-color: #c4aead;
+    color: #fff;
+    padding: 100px 100px;
+    margin-bottom: 0;
+  }
+#header h1{
+    font-size: 4rem;
+}
+#about{
+    /* display: flex; */
+    /* flex-direction: row-reverse; */
+    background-color: #f2f3f4;
+    padding: 60px 50px;
 }
 
+#forms {
+    display: flex;
+    background-color: #f2f3f4;  
+    padding: 1rem;
+    justify-content: space-around;
+}
 
+#details{
+    font-size: x-large;
+    padding: 20px;
+}
+
+#details>p{
+    margin: 0;
+}
+#optionTable{
+    width: 75%;
+    margin: 0 auto 0 auto;
+}
+
+#back{
+    margin-left: 45%;
+}
+
+#editForm{
+    height: 100
+    background-color: aquamarine;
+    
+}

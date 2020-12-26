@@ -1,8 +1,50 @@
+<%- include('partials/header') %> 
+<%- include('partials/flash') %>
 
-<form method="POST" action="/edit/<%= preference.studID %>/<%= preference.Pnum %>">
+<div>
     
-    <p><%= preference.Pnum  %></p>
-    <input type="text" placeholder="univID" name="univ">
-    <input type="text" placeholder="courseID" name="course">
-    <button>submit</button>
-</form>
+    <div id="details" class="w-50 mx-auto text-center">
+        <h1>EDIT FORM</h1>
+        <H3>Student ID: <%= preference.studID %></H3>
+        <h3>Preference number: <%= preference.Pnum %></h3>
+    </div>
+    
+    <div class="card my-4 border border-dark bg-light">
+        <div class="card-body">
+    
+            <form method="POST" action="/edit/<%= preference.studID %>/<%= preference.Pnum %>">
+        
+                <div class="mb-3">
+                    <select name="univ" id="" class="form-control form-select" aria-label="Default select example">
+                        <% for(i=0;i<university.length;i++) {%>
+                        <option value="<%= university[i].ID %>"><%= university[i].ID %> - <%= university[i].name %></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <select name="course" id="" class="form-control form-select" aria-label="Default select example">
+                        <% for(i=0;i<course.length;i++) {%>
+                        <option value="<%= course[i].ID %>"><%= course[i].ID %> - <%= course[i].name %></option>
+                        <% } %>
+                    </select>
+                </div>
+                
+                <button class="btn btn-success">submit</button>
+            </form>
+        </div>
+    </div>
+    
+    <div  id="back" >
+        <button class="btn btn-primary">
+            <a href="/optionEntry/<%= preference.studID %>" class="text-light">Back</a>
+        </button>
+        <button class="btn btn-danger">
+            <a href="/" class="text-light">LOG OUT</a>
+        </button>
+    </div>
+
+</div>
+
+
+
+<%- include('partials/footer') %>

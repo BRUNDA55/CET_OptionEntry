@@ -5,7 +5,7 @@ const flash = require("connect-flash");
 const session = require("express-session");
 
 const app = express();
-
+// just checking
 const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -48,74 +48,51 @@ app.get("/", function (req, res) {
     res.render("login");
 });
 
-// new show
-// app.get("/optionEntry/:id", (req, res)=>{
-//     const id = req.params.id;
-//     const q1 = `select * from Student where ID = ${mysql.escape(id)}`;
-//     connection.query(q1, (err, result1)=>{
-//         if (err) 
-//             throw err;
-//         else 
-//         {
-//             if (result1.length == 0) {
-//                 req.flash("error", "Invalid student ID");
-//                 res.redirect("/");
-//             }
-//             else{
-//                 const q2 = `select ID, name from University`;
-//                 connection.query(q2, (err, result2)=>{
-//                     if(err) throw err;
-//                     else{
-//                         const q3 = `select ID, name from Course`;
-//                         connection.query(q3, (err, result3)=>{
-//                             if(err) throw err;
-//                             console.log(result2);
-//                             console.log(result3);
-//                             console.log(result1[0]);
-//                             res.render('option', {student: result1[0], university: result2[0], course: result3[0]})
-//                         })
-//                     }
-//                 })
-//             }
-//         }
-//     })
-// })
+app.get('/showSeatMatrix', (req, res)=>{
+    const q = `select univID, U.name as univName, courseID, C.name as courseName, numOfSeats, fees from course C, university U, seatmatrix M where M.univID = U.ID and M.courseID = C.ID order by univID, courseID`;
+    connection.query(q, (err, result)=>{
+        if(err) throw err;
+        res.render('seatmatrix',{seatmatrix: result});
+    })
+})
 
-// show route 
-app.get("/optionEntry/:id", (req, res) => {
+// new show
+app.get("/optionEntry/:id", (req, res)=>{
     const id = req.params.id;
-    const q = `select * from Student where ID = ${mysql.escape(id)}`;
-    connection.query(q, (err, results) => {
-        if (err) throw err;
-        else {
-            if (results.length == 0) {
+    const q1 = `select * from Student where ID = ${mysql.escape(id)}`;
+    connection.query(q1, (err, result1)=>{
+        if (err) 
+            throw err;
+        else 
+        {
+            if (result1.length == 0) {
                 req.flash("error", "Invalid student ID");
                 res.redirect("/");
-            } else {
-                const q2 =
-                    "select univID, U.name as univName, courseID, C.name as courseName, numOfSeats from course C, university U, seatmatrix M where M.univID = U.ID and M.courseID = C.ID order by univID, courseID";
-                connection.query(q2, (err, results2) => {
-                    if (err) throw err;
-                    else {
-                        // console.log(results2);
-                        const q3 = `select * from Preference where studID = ${mysql.escape(id)} order by Pnum`;
-                        connection.query(q3, (err, results3) => {
-                            if (err) throw err;
-                            console.log(results3);
-                            res.render("option", {
-                                student: results[0],
-                                seatmatrix: results2,
-                                preference: results3,
-                            });
-                        });
+            }
+            else{
+                const q2 = `select * from University`;
+                connection.query(q2, (err, result2)=>{
+                    if(err) throw err;
+                    else{
+                        const q3 = `select * from Course`;
+                        connection.query(q3, (err, result3)=>{
+                            if(err) throw err;
+                            else{
+                                const q4 = `select * from Preference where studID = ${mysql.escape(id)} order by Pnum`;
+                                connection.query(q4, (err, result4)=>{
+                                    if(err) throw err;
+                                    res.render('option', {student: result1[0], university: result2, course: result3, preference: result4})
+                                })
+                            }
+                        })
                     }
-                });
+                })
             }
         }
-    });
-});
+    })
+})
 
-// create route
+// insert/create preference route
 app.post("/insertNew/:id", (req, res) => {
     const id = req.params.id;
     const pref = {
@@ -134,16 +111,28 @@ app.post("/insertNew/:id", (req, res) => {
     });
 });
 
-// edit route
+
+// edit preference route
 app.get('/edit/:id/:num', (req, res)=>{
     const {id, num} = req.params;
     const q = `select * from Preference where studID = ${mysql.escape(id)} and Pnum = ${mysql.escape(num)}`;
     connection.query(q, (err, result)=>{
         if(err) throw err;
-        res.render('edit_form', {preference: result[0]});
+        else{
+            const q1 = `select * from University`;
+            connection.query(q1, (err, result1)=>{
+                if(err) throw err;
+                else{
+                    const q2 = `select * from Course`;
+                    connection.query(q2, (err, result2)=>{
+                        if(err) throw err;
+                        res.render('edit_form', {preference: result[0], university: result1, course: result2});
+                    })
+                }
+            })
+        }
     })
 })
-
 app.post('/edit/:id/:num', (req, res)=>{
     const {id, num} = req.params;
     const univ = req.body.univ;
@@ -153,12 +142,14 @@ app.post('/edit/:id/:num', (req, res)=>{
         if(err) {
             console.log(err.sqlMessage);
             req.flash("error", err.sqlMessage);
+            res.redirect(`/edit/${id}/${num}`);
         }
-        res.redirect(`/optionEntry/${id}`);
+        else
+            res.redirect(`/optionEntry/${id}`);
     })
 })
 
-// delete route
+// delete preference route
 app.get('/delete/:id/:num', (req, res)=>{
     const {id, num} = req.params;
     const q = `delete from Preference where studID = ${mysql.escape(id)} and Pnum = ${mysql.escape(num)}`;
@@ -169,6 +160,80 @@ app.get('/delete/:id/:num', (req, res)=>{
         }
         req.flash("error", "option deleted!!!");
         res.redirect(`/optionEntry/${id}`);
+    })
+})
+
+//ADMIN ROUTES
+
+app.post('/admin', (req, res)=>{
+    let id = req.body.adminId;
+    res.redirect(`/showAdmin/${id}`);
+})
+
+app.get('/showAdmin/:id', (req, res)=>{
+    const q1 = `select * from Offers, University where univID = ID and univID in (select ID from University where adminID = ${mysql.escape(req.params.id)})`
+    connection.query(q1, (err, result1)=>{
+        if(err) throw err;
+        else{
+            if(result1.length == 0){
+                console.log(result1[0]);
+                req.flash("error", "Invalid admin ID");
+                res.redirect("/");
+            }
+            else{
+               console.log(result1);
+               res.render('showAdmin', {univ: result1});
+            }
+        }
+    })
+})
+
+app.post('/editCredits/:univID/:adminID/:courseID', (req, res)=>{
+    const {univID, adminID, courseID} = req.params;
+    const credits = req.body.credits;
+    const q = `update offers set totalCredits = ${mysql.escape(credits)} where univID = ${mysql.escape(univID)} and courseID = ${mysql.escape(courseID)}`;
+    connection.query(q, (err, result)=>{
+        if(err) throw err;
+        else{
+            req.flash("success", 'successfull updated');
+            res.redirect(`/showAdmin/${adminID}`);
+        }
+    })
+})
+
+app.post('/addCourse/:adminID/:univID', (req, res)=>{
+    const univID = req.params.univID;
+    const courseID =  req.body.courseID;
+    const credits = req.body.credits;
+    const numOfSeats = req.body.numOfSeats;
+    const course = {
+        univID: req.params.univID,
+        courseID: req.body.courseID,
+        totalCredits: req.body.credits
+    };
+    const seat = {
+        univID: req.params.univID,
+        courseID: req.body.courseID,
+        numOfSeats: req.body.numOfSeats
+    }
+    const q1 = 'insert into Offers set ?';
+    const q2 = 'insert into SeatMatrix set ?';
+    connection.query(q1, course, (err, result1)=>{
+        if(err){
+            console.log(err.sqlMessage);
+            req.flash("error", err.sqlMessage);
+        }
+        else{
+            connection.query(q2, seat, (err, result2)=>{
+                if(err)
+                {
+                    console.log(err.sqlMessage);
+                    req.flash("error", err.sqlMessage);
+                }
+                req.flash("success", 'successfully added course');
+                res.redirect(`/showAdmin/${req.params.adminID}`);
+            })            
+        }
     })
 })
 

@@ -1,0 +1,37 @@
+<%- include('partials/header') %> 
+<%- include('partials/flash') %>
+
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a href="/" class="navbar-brand">HOME</a>
+    </div>
+</nav>
+
+<div class="container-fluid mt-5">
+    <h1 class="text-center">Seat Matrix</h1>
+    <table class="table" >
+        <thead class="thead-dark">
+            <th>University ID</th>
+            <th>University Name</th>
+            <th>Course ID</th>
+            <th>Course Name</th>
+            <th>Number of Seats</th>
+            <th>Fees</th>
+        </thead>
+        <tbody>
+            <% for(i=0; i<seatmatrix.length;i++) { %>
+                <tr style="background-color: rgb(247, 238, 242);">
+                    <td><%= seatmatrix[i].univID %></td>
+                    <td><%= seatmatrix[i].univName %></td>
+                    <td><%= seatmatrix[i].courseID %></td>
+                    <td><%= seatmatrix[i].courseName %></td>
+                    <td><%= seatmatrix[i].numOfSeats %></td>
+                    <td><%= seatmatrix[i].fees %></td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+
+<%- include('partials/footer') %> 
