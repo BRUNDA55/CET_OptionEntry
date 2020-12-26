@@ -5,8 +5,12 @@
     
     <div id="details" class="w-50 mx-auto text-center">
         <h1>EDIT FORM</h1>
-        <H3>Student ID: <%= preference.studID %></H3>
-        <h3>Preference number: <%= preference.Pnum %></h3>
+        <h3>Current Status</h3>
+        <H5>Student ID        - <%= preference.studID %></H5>
+        <h5>Preference number - <%= preference.Pnum %></h5>
+        <h5>University ID     - <%= preference.univID %></h5>
+        <h5>Course ID         - <%= preference.courseID %></h5>
+        <a href="/showSeatMatrix" class="btn btn-outline-dark mt-3">Seat Matrix</a>
     </div>
     
     <div class="card my-4 border border-dark bg-light">
@@ -15,18 +19,12 @@
             <form method="POST" action="/edit/<%= preference.studID %>/<%= preference.Pnum %>">
         
                 <div class="mb-3">
-                    <select name="univ" id="" class="form-control form-select" aria-label="Default select example">
-                        <% for(i=0;i<university.length;i++) {%>
-                        <option value="<%= university[i].ID %>"><%= university[i].ID %> - <%= university[i].name %></option>
-                        <% } %>
-                    </select>
+                    <label for="univ" class="form-label">University ID</label>
+                    <input type="text" name="univ" id="univ" class="form-control" placeholder="E025">
                 </div>
                 <div class="mb-3">
-                    <select name="course" id="" class="form-control form-select" aria-label="Default select example">
-                        <% for(i=0;i<course.length;i++) {%>
-                        <option value="<%= course[i].ID %>"><%= course[i].ID %> - <%= course[i].name %></option>
-                        <% } %>
-                    </select>
+                    <label for="course" class="form-label">Course ID</label>
+                    <input type="text" name="course" id="course" class="form-control" placeholder="c12">
                 </div>
                 
                 <button class="btn btn-success">submit</button>
@@ -35,12 +33,8 @@
     </div>
     
     <div  id="back" >
-        <button class="btn btn-primary">
-            <a href="/optionEntry/<%= preference.studID %>" class="text-light">Back</a>
-        </button>
-        <button class="btn btn-danger">
-            <a href="/" class="text-light">LOG OUT</a>
-        </button>
+            <a href="/optionEntry/<%= preference.studID %>" class="btn btn-primary">Back</a>
+            <a href="/" class="btn btn-danger">LOG OUT</a>
     </div>
 
 </div>

@@ -56,9 +56,10 @@ app.get('/showSeatMatrix', (req, res)=>{
     })
 })
 
-// new show
+// show
 app.get("/optionEntry/:id", (req, res)=>{
     const id = req.params.id;
+    // q1 query to select student details
     const q1 = `select * from Student where ID = ${mysql.escape(id)}`;
     connection.query(q1, (err, result1)=>{
         if (err) 
@@ -66,28 +67,18 @@ app.get("/optionEntry/:id", (req, res)=>{
         else 
         {
             if (result1.length == 0) {
-                req.flash("error", "Invalid student ID");
+                req.flash("error", "Invalid student ID, enter again.");
                 res.redirect("/");
             }
-            else{
-                const q2 = `select * from University`;
+            else
+            {
+                // q2 query to select preference details of that student
+                const q2 = `select * from Preference where studID = ${mysql.escape(id)} order by Pnum`;
                 connection.query(q2, (err, result2)=>{
                     if(err) throw err;
-                    else{
-                        const q3 = `select * from Course`;
-                        connection.query(q3, (err, result3)=>{
-                            if(err) throw err;
-                            else{
-                                const q4 = `select * from Preference where studID = ${mysql.escape(id)} order by Pnum`;
-                                connection.query(q4, (err, result4)=>{
-                                    if(err) throw err;
-                                    res.render('option', {student: result1[0], university: result2, course: result3, preference: result4})
-                                })
-                            }
-                        })
-                    }
+                    res.render('option', {student: result1[0], preference: result2})
                 })
-            }
+            }           
         }
     })
 })
@@ -104,13 +95,20 @@ app.post("/insertNew/:id", (req, res) => {
     const q = "INSERT INTO Preference set ?";
     connection.query(q, pref, (err, results) => {
         if (err) {
-            console.log(err.sqlMessage);
-            req.flash("error", err.sqlMessage);
+            if(err.errno == 1062)
+                req.flash("error", 'DUPLICATE OPTION - cannot insert. Please add new one.');
+            else if(err.errno == 1452)
+                req.flash("error", "CANNOT ADD OPTION - University ID or Course ID doesn't exist. Please refer Seat Matrix.");
+            else
+                req.flash("error", 'CANNOT ADD OPTION ! TRY AGAIN');
+        }
+        else{
+            req.flash("success", "Successfully inserted new option :)");
         }
         res.redirect(`/optionEntry/${id}`);
+        
     });
 });
-
 
 // edit preference route
 app.get('/edit/:id/:num', (req, res)=>{
@@ -118,19 +116,8 @@ app.get('/edit/:id/:num', (req, res)=>{
     const q = `select * from Preference where studID = ${mysql.escape(id)} and Pnum = ${mysql.escape(num)}`;
     connection.query(q, (err, result)=>{
         if(err) throw err;
-        else{
-            const q1 = `select * from University`;
-            connection.query(q1, (err, result1)=>{
-                if(err) throw err;
-                else{
-                    const q2 = `select * from Course`;
-                    connection.query(q2, (err, result2)=>{
-                        if(err) throw err;
-                        res.render('edit_form', {preference: result[0], university: result1, course: result2});
-                    })
-                }
-            })
-        }
+        else
+            res.render('edit_form', {preference: result[0]});     
     })
 })
 app.post('/edit/:id/:num', (req, res)=>{
@@ -140,12 +127,19 @@ app.post('/edit/:id/:num', (req, res)=>{
     const q = `update Preference set courseID = ${mysql.escape(course)}, univID = ${mysql.escape(univ)} where studID = ${mysql.escape(id)} and Pnum = ${mysql.escape(num)}`;
     connection.query(q, (err, result)=>{
         if(err) {
-            console.log(err.sqlMessage);
-            req.flash("error", err.sqlMessage);
+            if(err.errno == 1062)
+                req.flash("error", 'DUPLICATE OPTION - cannot EDIT. Please try again.');
+            else if(err.errno == 1452 || err.errno == 1406)
+                req.flash("error", "CANNOT EDIT OPTION - University ID or Course ID doesn't exist. Please refer Seat Matrix.");
+            else
+                req.flash("error", 'CANNOT EDIT OPTION ! TRY AGAIN');
             res.redirect(`/edit/${id}/${num}`);
         }
-        else
+        else{
+            req.flash("success", `Successfully Updated Option Number ${num}.`)
             res.redirect(`/optionEntry/${id}`);
+        }
+            
     })
 })
 
@@ -158,7 +152,8 @@ app.get('/delete/:id/:num', (req, res)=>{
             console.log(err.sqlMessage);
             req.flash("error", err.sqlMessage);
         }
-        req.flash("error", "option deleted!!!");
+        else
+            req.flash("success", `Option number ${num} successfully deleted !`);
         res.redirect(`/optionEntry/${id}`);
     })
 })
@@ -171,18 +166,27 @@ app.post('/admin', (req, res)=>{
 })
 
 app.get('/showAdmin/:id', (req, res)=>{
-    const q1 = `select * from Offers, University where univID = ID and univID in (select ID from University where adminID = ${mysql.escape(req.params.id)})`
+    const q1 = `select * from University where adminID = ${mysql.escape(req.params.id)}`;
+    const q2 = `select * from Offers, University where univID = ID and univID in (select ID from University where adminID = ${mysql.escape(req.params.id)})`
     connection.query(q1, (err, result1)=>{
         if(err) throw err;
         else{
             if(result1.length == 0){
                 console.log(result1[0]);
-                req.flash("error", "Invalid admin ID");
+                req.flash("error", "Invalid admin ID. Enter again.");
                 res.redirect("/");
             }
             else{
-               console.log(result1);
-               res.render('showAdmin', {univ: result1});
+                connection.query(q2, (err, result2)=>{
+                    if(err)
+                        throw err;
+                    else
+                    {
+                        console.log(result2);
+                        res.render('showAdmin', {admin: result1,univ: result2});
+                    }
+                })
+               
             }
         }
     })
@@ -193,47 +197,51 @@ app.post('/editCredits/:univID/:adminID/:courseID', (req, res)=>{
     const credits = req.body.credits;
     const q = `update offers set totalCredits = ${mysql.escape(credits)} where univID = ${mysql.escape(univID)} and courseID = ${mysql.escape(courseID)}`;
     connection.query(q, (err, result)=>{
-        if(err) throw err;
+        if(err){
+            req.flash("error",err.sqlMessage);
+        }
         else{
             req.flash("success", 'successfull updated');
-            res.redirect(`/showAdmin/${adminID}`);
         }
+        res.redirect(`/showAdmin/${adminID}`);
     })
 })
 
 app.post('/addCourse/:adminID/:univID', (req, res)=>{
-    const univID = req.params.univID;
-    const courseID =  req.body.courseID;
-    const credits = req.body.credits;
-    const numOfSeats = req.body.numOfSeats;
+    const {adminID, univID} = req.params;
+    const{courseID, credits, numOfSeats} = req.body;
     const course = {
-        univID: req.params.univID,
-        courseID: req.body.courseID,
-        totalCredits: req.body.credits
+        univID: univID,
+        courseID: courseID,
+        totalCredits: credits
     };
     const seat = {
-        univID: req.params.univID,
-        courseID: req.body.courseID,
-        numOfSeats: req.body.numOfSeats
+        univID: univID,
+        courseID: courseID,
+        numOfSeats: 60
     }
     const q1 = 'insert into Offers set ?';
     const q2 = 'insert into SeatMatrix set ?';
     connection.query(q1, course, (err, result1)=>{
         if(err){
-            console.log(err.sqlMessage);
-            req.flash("error", err.sqlMessage);
+            console.log(err);
+            if(err.sqlState == '45000')
+                req.flash("error", err.sqlMessage);
+            else
+                req.flash("error", "CANNOT ADD COURSE - Invalid course ID. Try Again.")
         }
         else{
             connection.query(q2, seat, (err, result2)=>{
                 if(err)
                 {
-                    console.log(err.sqlMessage);
-                    req.flash("error", err.sqlMessage);
+                    req.flash("error", "CANNOT ADD COURSE - Invalid course ID. Try Again.")
                 }
-                req.flash("success", 'successfully added course');
-                res.redirect(`/showAdmin/${req.params.adminID}`);
+                else
+                    req.flash("success", 'successfully added course');
             })            
         }
+        res.redirect(`/showAdmin/${adminID}`);
+
     })
 })
 

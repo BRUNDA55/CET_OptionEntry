@@ -5,28 +5,18 @@
     <div class="container-fluid">
         
         <!-- <button id="seat-matrix" class="btn btn-success mt-3"> -->
-        <a href="/showSeatMatrix" class="text-dark navbar-brand">View Seat Matrix</a>
-        <a href="/" class="navbar-brand">LOG OUT</a>
+        <a href="/showSeatMatrix" class="btn btn-outline-dark">View Seat Matrix</a>
+        <a href="/" class="btn btn-outline-danger">LOG OUT</a>
         <!-- </button> -->
     </div>
 </nav>
 <%- include('partials/flash') %>
 <div id="header" class="jumbotron">
-    <h1 class="text-center">welcome to option entry</h1>
+    <h1 class="text-center">WELCOME TO OPTION ENTRY</h1>
 </div>
 
 
 <div id="option">
-    
-    <!-- <ul class="list-group">
-        <li class="list-group-item text-center">
-            Student ID : <%= student.ID %>
-        </li>
-        <li class="list-group-item text-center">
-            email : <%= student.email %>
-        </li>
-    </ul> -->
-    
     <div id="details" class="w-50 mx-auto text-center">
         <h3 class="text-center my-3">Hi there, <%= student.fname %>  <%= student.mname %> <%= student.lname %></h3>
         <p>Student ID : <%= student.ID %></p>
@@ -43,33 +33,18 @@
                 <label for="pnumber" class="form-label">Preference Number</label>
                 <input type="number" placeholder="preference number" name="number" id="pnumber" class="form-control">
             </div>
-            
-            <!-- <input type="text" placeholder="univID" name="univ"> -->
             <div class="mb-3">
-                <select name="univ" id="" class="form-control form-select" aria-label="Default select example">
-                    <option selected disabled>Select University</option>
-                    <% for(i=0;i<university.length;i++) {%>
-                    <option value="<%= university[i].ID %>"><%= university[i].ID %> - <%= university[i].name %></option>
-                    <% } %>
-                </select>
+                <label for="univ" class="form-label">University ID</label>
+                <input type="text" name="univ" id="univ" class="form-control" placeholder="E025">
             </div>
-            
             <div class="mb-3">
-                <select name="course" class="form-control form-select" aria-label="Default select example">
-                    <option selected disabled>Select Course</option>
-                    <% for(i=0;i<course.length;i++) {%>
-                    <option value="<%= course[i].ID %>"><%= course[i].ID %> - <%= course[i].name %></option>
-                    <% } %>
-                </select>
+                <label for="course" class="form-label">Course ID</label>
+                <input type="text" name="course" id="course" class="form-control" placeholder="c12">
             </div>
-            <!-- <input type="text" placeholder="courseID" name="course"> -->
-            
             <button class="btn btn-success">submit</button>
         </form>
     </div>
 </div>
-
-
 
 <div id="optionTable">
     <h3 class="text-center pb-2">Your Options</h3>
@@ -87,8 +62,8 @@
                     <td><%= preference[p].Pnum %></td>
                     <td><%= preference[p].univID %></td>
                     <td><%= preference[p].courseID %></td>
-                    <td><button class="btn btn-primary"><a href="/edit/<%= preference[p].studID %>/<%= preference[p].Pnum %>" class="text-light">edit</a></button></td>
-                    <td><button class="btn btn-danger"><a href="/delete/<%= preference[p].studID %>/<%= preference[p].Pnum %>" class="text-light">delete</a></button></td>
+                    <td><a href="/edit/<%= preference[p].studID %>/<%= preference[p].Pnum %>" class="btn btn-primary">edit</a></td>
+                    <td><a href="/delete/<%= preference[p].studID %>/<%= preference[p].Pnum %>" class="btn btn-danger">delete</a></td>
                 </tr>
                 <% } %>
         </tbody>
